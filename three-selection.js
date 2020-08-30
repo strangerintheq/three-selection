@@ -6,7 +6,7 @@ class ThreeSelection {
         this.overrideMaterial = new THREE.MeshBasicMaterial({
             color: new THREE.Color(0xffffff)
         });
-        this.renderTarget = new THREE.WebGLRenderTarget(512, 512);
+        this.renderTarget = new THREE.WebGLRenderTarget(2048, 2048);
 
         const quadGeometry = new THREE.PlaneGeometry(2, 2);
         const shaderMaterial = new THREE.ShaderMaterial({

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js selection</title>
+</head>
+<body style="margin: 0; overflow: hidden">
+<script src="https://unpkg.com/three@0.119.0/build/three.js"></script>
+<script src="https://unpkg.com/three@0.119.0/examples/js/controls/OrbitControls.js"></script>
+<script src="three-selection.js"></script>
+<script>
+
+    // usage example
+
+    const selection = new ThreeSelection();
+
+    installRayCaster((intersects) => {
+        selection.clearSelection();
+        for ( let i = 0; i < intersects.length; i++ )
+            selection.addToSelection(intersects[i].object);
+    })
+
+    // three js related code
+
+    const geometry = new THREE.CubeGeometry();
+    const mat = new THREE.MeshNormalMaterial();
+    const rnd = () => ((Math.random()-0.5)*10)|0;
+
+    const scene = new THREE.Scene();
+    for (let i = 0; i < 11; i++) {
+        const cube = new THREE.Mesh(geometry, mat);
+        cube.position.x = rnd()
+        cube.position.z = rnd()
+        scene.add(cube);
+    }
+
+    const renderer = new THREE.WebGLRenderer({
+        antialias: true
+    });
+    document.body.appendChild(renderer.domElement);
+
+    const camera = new THREE.PerspectiveCamera( );
+    camera.position.z = 12;
+    camera.position.y = 12;
+    camera.lookAt(new THREE.Vector3());
+    new THREE.OrbitControls(camera, renderer.domElement);
+
+    requestAnimationFrame(function f() {
+        if (renderer.width !== innerWidth || renderer.height !== innerHeight) {
+            renderer.setSize(innerWidth, innerHeight);
+            camera.aspect = innerWidth / innerHeight;
+            camera.updateProjectionMatrix();
+        }
+        renderer.render(scene, camera);
+        selection.renderSelection(renderer, scene, camera);
+        requestAnimationFrame(f);
+    });
+
+    function installRayCaster(callback){
+
+        const rayCaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const start = new THREE.Vector2();
+
+        let lastTouch;
+
+        addEventListener('mousedown', rayCastStart, true);
+        addEventListener('mouseup', rayCastEnd, true);
+
+        addEventListener('touchstart', e => rayCastStart(lastTouch = e.touches[0]));
+        addEventListener('touchmove', e => lastTouch = e.touches[0]);
+        addEventListener('touchend', () => rayCastEnd(lastTouch));
+
+        function rayCastStart(e) {
+            start.set(e.clientX, e.clientY);
+        }
+
+        function rayCastEnd(e) {
+            const dx = e.clientX - start.x;
+            const dy = e.clientY - start.y;
+            if (dx**2 + dy**2 > 9)
+                return
+            mouse.x =  (e.clientX / innerWidth ) * 2 - 1;
+            mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+            rayCaster.setFromCamera(mouse, camera);
+            callback(rayCaster.intersectObjects(scene.children));
+        }
+    }
+
+</script>
+</body>
+</html>

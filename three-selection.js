@@ -2,9 +2,6 @@ class ThreeSelection {
 
     constructor() {
         this.selectedObjects = [];
-        this.overrideMaterial = new THREE.MeshBasicMaterial({
-            color: new THREE.Color(0xffffff)
-        });
         this.renderTarget = new THREE.WebGLRenderTarget(2048, 2048);
         this.uniforms = {
             tex: new THREE.Uniform(this.renderTarget.texture),
@@ -30,22 +27,24 @@ class ThreeSelection {
                 uniform float height;
                 uniform float time;
                 
-                const float Pi2 = 6.28318530718; 
-                const float Directions = 16.0;
-                const float Quality = 3.5; 
-                const float Size = 8.0; 
+                const float pi2 = 6.28318530718; 
+                const float directions = 16.0;
+                const float quality = 3.5; 
+                const float size = 8.0; 
                 
                 void main() {
         
-                    vec2 Radius = Size/vec2(width, height);
+                    vec2 radius = size/vec2(width, height);
                     float alpha = texture2D(tex, vUv).a;
                     
-                    for (float d = 0.0; d < Pi2; d += Pi2/Directions) {
-                        for (float i = 1.0/Quality; i <= 1.0; i += 1.0/Quality) {
-                            alpha += texture2D( tex, vUv+vec2(cos(d),sin(d))*Radius*i).a;
+                    for (float d = 0.0; d < pi2; d += pi2/directions) {
+                        for (float i = 1.0/quality; i <= 1.0; i += 1.0/quality) {
+                            alpha += texture2D( tex, vUv+vec2(cos(d),sin(d))*radius*i).a;
                         }
                     }
-                    float result = alpha / (Quality * Directions - 15.0);
+                    
+                    float result = alpha / (quality * directions - 15.0);
+                    
                     vec4 outlineColor = vec4(1.0, sin(time)*0.5+0.5, 0.0, 1.0); 
                     gl_FragColor = outlineColor * (min(1.0, alpha) - result);
                 }
@@ -82,8 +81,7 @@ class ThreeSelection {
 
     renderSelection(renderer, scene, camera) {
         renderer.setRenderTarget(this.renderTarget);
-        const oldOverrideMaterial = scene.overrideMaterial;
-        scene.overrideMaterial = this.overrideMaterial;
+
         scene.traverse(o => {
             o.originalVisible = o.visible
             o.visible = false;
@@ -94,14 +92,13 @@ class ThreeSelection {
         });
         renderer.render(scene, camera);
         scene.traverse(o => o.visible = o.originalVisible);
-        scene.overrideMaterial = oldOverrideMaterial
         renderer.setRenderTarget(null);
 
         const autoClear = renderer.autoClear;
         renderer.autoClear = false;
         this.uniforms.width.value = innerWidth;
         this.uniforms.height.value = innerHeight;
-        this.uniforms.time.value = Date.now()%10000/1000;
+        this.uniforms.time.value = Math.PI*2*((Date.now()%3000)/3000);
         renderer.render(this.fullScreenQuadScene, this.orthographicCamera);
         renderer.autoClear = autoClear;
 

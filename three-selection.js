@@ -1,6 +1,31 @@
 class ThreeSelection {
 
     constructor() {
+
+        this.fragmentShader = `
+            varying vec2 vUv;
+            uniform sampler2D tex;
+            uniform float width;
+            uniform float height;
+            uniform float time;
+            
+            const float pi2 = 6.28318530718; 
+            const float directions = 12.0;
+            const float quality = 3.0; 
+            const float size = 8.0; 
+            
+            void main() {
+                vec2 radius = size/vec2(width, height);
+                float alpha;
+                for (float d = 0.0; d < pi2; d += pi2/directions) 
+                    for (float i = 1.0/quality; i <= 1.0; i += 1.0/quality) 
+                        alpha += texture2D(tex, vUv+vec2(cos(d),sin(d))*radius*i).a;
+                float result = alpha / (directions*quality - directions*2.);
+                vec4 outlineColor = vec4(1.0, sin(time)*0.5+0.5, 0.0, 1.0); 
+                gl_FragColor = outlineColor * (min(1.0, alpha) - result);
+            }
+        `;
+
         this.selectedObjects = [];
         this.renderTarget = new THREE.WebGLRenderTarget(2048, 2048);
         this.uniforms = {
@@ -20,35 +45,7 @@ class ThreeSelection {
                     gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
                 }
             `,
-            fragmentShader: `
-                varying vec2 vUv;
-                uniform sampler2D tex;
-                uniform float width;
-                uniform float height;
-                uniform float time;
-                
-                const float pi2 = 6.28318530718; 
-                const float directions = 16.0;
-                const float quality = 3.5; 
-                const float size = 8.0; 
-                
-                void main() {
-        
-                    vec2 radius = size/vec2(width, height);
-                    float alpha = texture2D(tex, vUv).a;
-                    
-                    for (float d = 0.0; d < pi2; d += pi2/directions) {
-                        for (float i = 1.0/quality; i <= 1.0; i += 1.0/quality) {
-                            alpha += texture2D( tex, vUv+vec2(cos(d),sin(d))*radius*i).a;
-                        }
-                    }
-                    
-                    float result = alpha / (quality * directions - 15.0);
-                    
-                    vec4 outlineColor = vec4(1.0, sin(time)*0.5+0.5, 0.0, 1.0); 
-                    gl_FragColor = outlineColor * (min(1.0, alpha) - result);
-                }
-            `
+            fragmentShader: this.fragmentShader
         });
 
         const quadMesh = new THREE.Mesh(quadGeometry, shaderMaterial);

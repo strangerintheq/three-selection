@@ -32,6 +32,8 @@
         cube.position.x = rnd()
         cube.position.z = rnd()
         scene.add(cube);
+        if (rnd()>0)
+            selection.addToSelection(cube);
     }
 
     const renderer = new THREE.WebGLRenderer({

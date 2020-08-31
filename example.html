@@ -45,7 +45,7 @@
     camera.lookAt(new THREE.Vector3());
     new THREE.OrbitControls(camera, renderer.domElement);
 
-    requestAnimationFrame(function f() {
+    requestAnimationFrame(function f(t) {
         if (renderer.width !== innerWidth || renderer.height !== innerHeight) {
             renderer.setSize(innerWidth, innerHeight);
             camera.aspect = innerWidth / innerHeight;

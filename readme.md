@@ -36,4 +36,4 @@ Usage
 
 Result:
 
-![](https://i.imgur.com/eXIfKaf.png)
+![](https://i.imgur.com/cY2JMwU.png)

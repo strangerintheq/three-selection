@@ -63,6 +63,23 @@ class ThreeSelection {
         this.selectedObjects.push(object3d);
     }
 
+    removeFromSelection(object3d) {
+        let index = this.selectedObjects.indexOf(object3d);
+        index !== -1 && this.selectedObjects.splice(index, 1);
+    }
+
+    contains(object3d){
+        return this.selectedObjects.indexOf(object3d) !== -1;
+    }
+
+    toggleSelected(object3d){
+        this.contains(object3d) ? this.removeFromSelection(object3d) : this.addToSelection(object3d);
+    }
+
+    clearSelection() {
+        this.selectedObjects.splice(0, this.selectedObjects.length);
+    }
+
     renderSelection(renderer, scene, camera) {
         renderer.setRenderTarget(this.renderTarget);
         const oldOverrideMaterial = scene.overrideMaterial;
@@ -90,7 +107,5 @@ class ThreeSelection {
 
     }
 
-    clearSelection() {
-        this.selectedObjects.splice(0, this.selectedObjects.length);
-    }
+
 }

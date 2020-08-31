@@ -14,10 +14,10 @@
 
     const selection = new ThreeSelection();
 
-    installRayCaster((intersects) => {
-        selection.clearSelection();
+    installRayCaster((intersects, ctrl) => {
+        !ctrl && selection.clearSelection();
         for ( let i = 0; i < intersects.length; i++ )
-            selection.addToSelection(intersects[i].object);
+            selection.toggleSelected(intersects[i].object);
     })
 
     // three js related code
@@ -83,7 +83,7 @@
             mouse.x =  (e.clientX / innerWidth ) * 2 - 1;
             mouse.y = -(e.clientY / innerHeight) * 2 + 1;
             rayCaster.setFromCamera(mouse, camera);
-            callback(rayCaster.intersectObjects(scene.children));
+            callback(rayCaster.intersectObjects(scene.children), e.ctrlKey);
         }
     }
 

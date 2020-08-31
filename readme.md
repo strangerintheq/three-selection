@@ -18,6 +18,15 @@ usage
     // add any object3d from your scene to selection
     selection.addToSelection(object3d);
 
+    // remove object3d from selection
+    removeFromSelection(object3d);
+    
+    // add object if not exist in selection and remove otherwise
+    toggleSelected(object3d);
+
+    // check object in selection 
+    contains(object3d);
+
     // clear selection
     selection.clearSelection();
     

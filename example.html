@@ -11,8 +11,8 @@
 <script>
 
     // usage example
-
-    const selection = new ThreeSelection();
+    const color = new THREE.Color(1,0,1);
+    const selection = new ThreeSelection(1024, 1024, color);
 
     installRayCaster((intersects, ctrl) => {
         !ctrl && selection.clearSelection();
@@ -53,6 +53,9 @@
             camera.aspect = innerWidth / innerHeight;
             camera.updateProjectionMatrix();
         }
+
+        selection.material.uniforms.color.value.r = Math.sin(t/1000)*0.5 + 0.5;
+
         renderer.render(scene, camera);
         selection.renderSelection(renderer, scene, camera);
         requestAnimationFrame(f);

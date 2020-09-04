@@ -1,17 +1,19 @@
 class ThreeSelection {
 
-    constructor(renderTextureWidth = 1024, renderTextureHeight = 1024) {
+    constructor(renderTextureWidth = 1024,
+                renderTextureHeight = 1024) {
 
         this.selectedObjects = [];
 
         this.renderTarget = new THREE.WebGLRenderTarget(renderTextureWidth, renderTextureHeight);
 
         const quadGeometry = new THREE.PlaneGeometry(2, 2);
-        const shaderMaterial = new THREE.ShaderMaterial({
+        this.material = new THREE.ShaderMaterial({
 
             transparent: true,
             uniforms: {
-                tex: new THREE.Uniform("t", this.renderTarget.texture)
+                tex: new THREE.Uniform(this.renderTarget.texture),
+                color: new THREE.Uniform(new THREE.Color(1,1,1)),
             },
             vertexShader: `
                 varying vec2 vUv;
@@ -22,6 +24,7 @@ class ThreeSelection {
             `,
             fragmentShader: `
                 varying vec2 vUv;
+                uniform vec3 color;
                 uniform sampler2D tex;
                 
                 const float Pi2 = 6.28318530718;
@@ -36,13 +39,12 @@ class ThreeSelection {
                         for (float i = 1.0/Quality; i <= 1.0; i += 1.0/Quality) 
                             alpha += texture2D( tex, vUv+vec2(cos(d),sin(d))*Radius*i).a;
                     float result = alpha / (Quality * Directions - 15.0);
-                    vec4 outlineColor = vec4(1.0, 1.0, 0.0, 1.0);
-                    gl_FragColor = outlineColor * min(1.0, alpha) - result;
+                    gl_FragColor = vec4(color, 1.0) * min(1.0, alpha) - result;
                 }
             `
         });
 
-        const quadMesh = new THREE.Mesh(quadGeometry, shaderMaterial);
+        const quadMesh = new THREE.Mesh(quadGeometry, this.material);
         this.fullScreenQuadScene = new THREE.Scene();
         this.fullScreenQuadScene.add(quadMesh);
         this.orthographicCamera = new THREE.OrthographicCamera(

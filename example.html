@@ -14,10 +14,10 @@
 
     const selection = new ThreeSelection();
 
-    installRayCaster((intersects) => {
-        selection.clearSelection();
+    installRayCaster((intersects, ctrl) => {
+        !ctrl && selection.clearSelection();
         for ( let i = 0; i < intersects.length; i++ )
-            selection.addToSelection(intersects[i].object);
+            selection.toggleSelected(intersects[i].object);
     })
 
     // three js related code
@@ -32,6 +32,8 @@
         cube.position.x = rnd()
         cube.position.z = rnd()
         scene.add(cube);
+        if (rnd()>0)
+            selection.addToSelection(cube);
     }
 
     const renderer = new THREE.WebGLRenderer({
@@ -45,7 +47,7 @@
     camera.lookAt(new THREE.Vector3());
     new THREE.OrbitControls(camera, renderer.domElement);
 
-    requestAnimationFrame(function f() {
+    requestAnimationFrame(function f(t) {
         if (renderer.width !== innerWidth || renderer.height !== innerHeight) {
             renderer.setSize(innerWidth, innerHeight);
             camera.aspect = innerWidth / innerHeight;
@@ -83,7 +85,7 @@
             mouse.x =  (e.clientX / innerWidth ) * 2 - 1;
             mouse.y = -(e.clientY / innerHeight) * 2 + 1;
             rayCaster.setFromCamera(mouse, camera);
-            callback(rayCaster.intersectObjects(scene.children));
+            callback(rayCaster.intersectObjects(scene.children), e.ctrlKey);
         }
     }
 

@@ -5,7 +5,7 @@ on top of last rendered frame
 
 ---
 
-Example https://raw.githack.com/strangerintheq/three-selection/master/example.html
+Example https://raw.githack.com/strangerintheq/three-selection/f9e874db2d164bc402b18c874cafb99c27e430e9/example.html
 
 ---
   
